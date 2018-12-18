@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 class OverflowUser(models.Model):
     name = models.CharField(max_length=50)
     bio = models.CharField(max_length=50)
-    reputation = models.IntegerField()
-    interests = models.ManyToManyField("Tag", symmetrical=False)
-    favorites = models.ManyToManyField("Question", symmetrical=False)
+    reputation = models.IntegerField(null=True)
+    interests = models.ManyToManyField("Tag", symmetrical=False, blank=True)
+    favorites = models.ManyToManyField("Question", symmetrical=False, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
