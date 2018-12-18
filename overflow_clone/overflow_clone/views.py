@@ -74,7 +74,8 @@ def question_form_view(request):
     html = "post.html"
     if form.is_valid():
         body = form.cleaned_data['body']
-        tags = form.fields['tags'].choices.queryset
+        tags = form.cleaned_data['tags']
+
         question = Question.objects.create(
             body=body,
             author=request.user.overflowuser
