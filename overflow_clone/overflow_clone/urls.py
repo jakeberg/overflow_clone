@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from django.urls import path
+from  overflow_clone import views
 from overflow_clone.models import (
     OverflowUser,
     Question,
@@ -30,4 +32,6 @@ admin.site.register(Tag)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    path('', views.homepage_view, name='homepage'),
+    path('post/', views.question_form_view,),
 ]
