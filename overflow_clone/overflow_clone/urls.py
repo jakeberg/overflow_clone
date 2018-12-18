@@ -21,8 +21,10 @@ from overflow_clone.views import (
     signup_view,
     login_view,
     logout_view,
-    question_form_view
+    question_form_view,
+    bio_form_view
 )
+from overflow_clone import views
 from overflow_clone.models import (
     OverflowUser,
     Question,
@@ -43,4 +45,5 @@ urlpatterns = [
     path('login/', login_view, name='login'),
     path('logout/', logout_view),
     path('post/', question_form_view,),
+    path('settings/', bio_form_view)
 ]

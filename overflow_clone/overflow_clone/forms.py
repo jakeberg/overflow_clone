@@ -19,3 +19,7 @@ class QuestionForm(forms.Form):
         queryset=Tag.objects.all(),
         widget=forms.CheckboxSelectMultiple()
         )
+
+
+class UserSettingsUpdateForm(forms.Form):
+    bio = forms.CharField(widget=forms.Textarea)
