@@ -47,7 +47,7 @@ def login_view(request):
         if next:
             return HttpResponseRedirect(next)
         else:
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(reverse('homepage'))
 
     return render(request, html, {'form': form})
 
@@ -59,13 +59,23 @@ def logout_view(request):
     return HttpResponseRedirect(reverse('homepage'))
 
 
-def homepage_view(request):
+def homepage_view(request, sort=None):
 
     html = "homepage.html"
-
+    if sort:
+        if sort == 'new':
+            questions = Question.objects.order_by('-date')
+        elif sort == 'upvote':
+            questions = Question.objects.order_by('vote')
+        elif sort == 'tag':
+            questions = Question.objects.order_by('tags')
+        elif sort == 'unanswered':
+            questions = Question.objects.order_by('answered')
+    else:
+        questions = Question.objects.all()
     content = {
+        'questions': questions
     }
-
     return render(request, html, content)
 
 
