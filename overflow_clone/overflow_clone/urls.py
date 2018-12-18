@@ -34,5 +34,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     path('', views.homepage_view, name='homepage'),
     path('signup/', views.signup_view),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view),
     path('post/', views.question_form_view,),
 ]
