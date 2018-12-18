@@ -38,7 +38,8 @@ admin.site.register(Tag)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    path('', homepage_view, name='homepage'),
+    path('home/', homepage_view, name='homepage'),
+    path('home/<sort>', homepage_view),
     path('signup/', signup_view),
     path('login/', login_view, name='login'),
     path('logout/', logout_view),

@@ -29,6 +29,7 @@ class Question(models.Model):
     comment = models.ManyToManyField("Comment", symmetrical=False)
     date = models.DateTimeField(auto_now_add=True)
     answered = models.BooleanField(default=False)
+    vote = models.IntegerField(default=0)
 
     def __str__(self):
         return self.body

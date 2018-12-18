@@ -28,6 +28,13 @@
         <section style=" display: flex; flex-direction: row; justify-content: center; padding: 20px 0 20px 0;">
             <a href="/post" class="btn btn-primary">Post Question</a>
         </section>
+        <section style=" display: flex; flex-direction: row; justify-content: center; padding: 20px 0 20px 0;">
+            Sort By:
+                <a href="/home/tag" class="btn btn-primary">Tag</a>
+                <a href="/home/new" class="btn btn-primary">Newest</a>
+                <a href="/home/upvote" class="btn btn-primary">Most Upvoted</a>
+                <a href="/home/unanswered" class="btn btn-primary">Unanswered</a>
+        </section>
         <div class="row">
             <div class="col">
                 empty
@@ -36,8 +43,16 @@
                 <div class="row">
                     <h4 class="col">Feed</h4>
                 </div>
+                {% for question in questions %}
                 <div class="card">
+                    <h6>{{question.author.name}} || {{question.date}}</h6>
+                    {{question.body}}
+                    <br>
+                    Tags: {% for tag in question.tags.all %}
+                    {{tag.title}}
+                    {%endfor%}
                 </div>
+                {% endfor %}
             </div>
             <div class="col">
                 <div class="card">
