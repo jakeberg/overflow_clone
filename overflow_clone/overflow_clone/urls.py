@@ -15,6 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from overflow_clone.models import (
+    OverflowUser,
+    Question,
+    Answer,
+    Comment,
+    Tag)
+
+admin.site.register(OverflowUser)
+admin.site.register(Question)
+admin.site.register(Answer)
+admin.site.register(Comment)
+admin.site.register(Tag)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
