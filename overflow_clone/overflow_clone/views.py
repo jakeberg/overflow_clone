@@ -1,7 +1,7 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
-from overflow_clone.models import OverflowUser
-from overflow_clone.forms import SignupForm, LoginForm
+from overflow_clone.models import OverflowUser, Question
+from overflow_clone.forms import SignupForm, LoginForm, QuestionForm
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 
@@ -70,10 +70,16 @@ def homepage_view(request):
 
 
 def question_form_view(request):
-
+    form = QuestionForm(None or request.POST)
     html = "post.html"
+    if form.is_valid():
+        body = form.cleaned_data['body']
+        tags = form.cleaned_data['tags']
 
-    content = {
-    }
-
-    return render(request, html, content)
+        question = Question.objects.create(
+            body=body,
+            author=request.user.overflowuser
+        )
+        question.tags.set(tags)
+        return HttpResponseRedirect(reverse('homepage'))
+    return render(request, html, {'form': form})

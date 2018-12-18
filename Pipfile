@@ -8,6 +8,7 @@ name = "pypi"
 [packages]
 "pep8" = "*"
 django = "*"
+ipdb = "*"
 
 [requires]
 python_version = "3.7"
