@@ -33,5 +33,6 @@ admin.site.register(Tag)
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     path('', views.homepage_view, name='homepage'),
+    path('signup/', views.signup_view),
     path('post/', views.question_form_view,),
 ]
