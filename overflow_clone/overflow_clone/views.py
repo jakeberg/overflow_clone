@@ -68,6 +68,8 @@ def logout_view(request):
 def homepage_view(request, sort=None):
 
     html = "homepage.html"
+    user = OverflowUser.objects.get(id=request.user.id)
+
     if sort:
         if sort == 'new':
             questions = Question.objects.order_by('-date')
@@ -79,8 +81,10 @@ def homepage_view(request, sort=None):
             questions = Question.objects.order_by('answered')
     else:
         questions = Question.objects.all()
+
     content = {
-        'questions': questions
+        'questions': questions,
+        'upvote_access': " " if user.reputation >= 15 else "disabled"
     }
     return render(request, html, content)
 
@@ -143,10 +147,16 @@ def upvote(request, vote_type, id):
         question = Question.objects.get(id=id)
         question.vote = question.vote + 1
         question.save()
+        user = OverflowUser.objects.get(id=question.author.id)
+        user.reputation = user.reputation + 5
+        user.save()
     if vote_type == 'answer':
         answer = Answer.objects.get(id=id)
         answer.vote = answer.vote + 1
         answer.save()
+        user = OverflowUser.objects.get(id=answer.author.id)
+        user.reputation = user.reputation + 10
+        user.save()
     if vote_type == 'comment':
         comment = Comment.objects.get(id=id)
         comment.vote = comment.vote + 1
@@ -159,10 +169,16 @@ def downvote(request, vote_type, id):
         question = Question.objects.get(id=id)
         question.vote = question.vote - 1
         question.save()
+        user = OverflowUser.objects.get(id=question.author.id)
+        user.reputation = user.reputation - 5
+        user.save()
     if vote_type == 'answer':
         answer = Answer.objects.get(id=id)
         answer.vote = answer.vote - 1
         answer.save()
+        user = OverflowUser.objects.get(id=answer.author.id)
+        user.reputation = user.reputation - 10
+        user.save()
     if vote_type == 'comment':
         comment = Comment.objects.get(id=id)
         comment.vote = comment.vote - 1

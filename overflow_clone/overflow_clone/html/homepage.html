@@ -70,10 +70,19 @@
                         Answers:<br>
                         {% for answer in question.answer.all %}
                         <div class="card">
-                            {{answer.body}} <br> <p class='vote_wrap'>Kenzie Karma: {{ answer.vote }} <a href="/upvote/answer/{{ answer.id }}">Upvote</a> <a href="/downvote/answer/{{ answer.id }}">Downvote</a></p>
+                            {{answer.body}} <br>
+                            <p class='vote_wrap'>
+                                Kenzie Karma: {{ answer.vote }}
+                                <a class="btn {{ upvote_access }}" href="/upvote/answer/{{ answer.id }}">Upvote</a>
+                                <a class="btn {{ upvote_access }}" href="/downvote/answer/{{ answer.id }}">Downvote</a>
+                            </p>
                         </div>
                         {%endfor%}
-                        <p class='vote_wrap'>Kenzie Karma: {{ question.vote }} <a href="/upvote/question/{{ question.id }}">Upvote</a> <a href="/downvote/question/{{ question.id }}">Downvote</a></p>
+                        <p class='vote_wrap'>
+                            Kenzie Karma: {{ question.vote }}
+                            <a class="btn {{ upvote_access }}" href="/upvote/question/{{ question.id }}">Upvote</a>
+                            <a class="btn {{ upvote_access }}" href="/downvote/question/{{ question.id }}">Downvote</a>
+                        </p>
                     </div>
                 </div>
                 {% endfor %}
