@@ -1,7 +1,12 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
-from overflow_clone.models import OverflowUser, Question, Answer
-from overflow_clone.forms import SignupForm, LoginForm, QuestionForm, AnswerForm
+from overflow_clone.models import OverflowUser, Question, Answer, Comment
+from overflow_clone.forms import (
+    SignupForm,
+    LoginForm,
+    QuestionForm,
+    AnswerForm
+    )
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 
@@ -109,3 +114,35 @@ def answer_form_view(request, question_id):
         Question.objects.get(id=question_id).answer.add(answer)
         return HttpResponseRedirect(reverse('homepage'))
     return render(request, html, {'form': form, 'form_name': 'Answer'})
+
+
+def upvote(request, vote_type, id):
+    if vote_type == 'question':
+        question = Question.objects.get(id=id)
+        question.vote = question.vote + 1
+        question.save()
+    if vote_type == 'answer':
+        answer = Answer.objects.get(id=id)
+        answer.vote = answer.vote + 1
+        answer.save()
+    if vote_type == 'comment':
+        comment = Comment.objects.get(id=id)
+        comment.vote = comment.vote + 1
+        comment.save()
+    return HttpResponseRedirect(reverse('homepage'))
+
+
+def downvote(request, vote_type, id):
+    if vote_type == 'question':
+        question = Question.objects.get(id=id)
+        question.vote = question.vote - 1
+        question.save()
+    if vote_type == 'answer':
+        answer = Answer.objects.get(id=id)
+        answer.vote = answer.vote - 1
+        answer.save()
+    if vote_type == 'comment':
+        comment = Comment.objects.get(id=id)
+        comment.vote = comment.vote - 1
+        comment.save()
+    return HttpResponseRedirect(reverse('homepage'))
