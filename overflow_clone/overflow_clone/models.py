@@ -26,16 +26,16 @@ class Question(models.Model):
     body = models.TextField(max_length=150)
     author = models.ForeignKey(OverflowUser, on_delete=models.CASCADE)
     tags = models.ManyToManyField(
-        "Tag", 
+        "Tag",
         symmetrical=False,
         blank=True)
     vote = models.IntegerField(null=True)
     answer = models.ManyToManyField(
-        "Answer", 
+        "Answer",
         symmetrical=False,
         blank=True)
     comment = models.ManyToManyField(
-        "Comment", 
+        "Comment",
         symmetrical=False,
         blank=True)
     date = models.DateTimeField(auto_now_add=True)
@@ -52,7 +52,7 @@ class Answer(models.Model):
         OverflowUser,
         on_delete=models.CASCADE,
         null=True)
-    vote = models.IntegerField(null=True)
+    vote = models.IntegerField(default=0)
     comment = models.ManyToManyField("Comment", symmetrical=False)
     date = models.DateTimeField(auto_now_add=True)
 
@@ -62,7 +62,7 @@ class Answer(models.Model):
 
 class Comment(models.Model):
     body = models.CharField(max_length=150)
-    vote = models.IntegerField()
+    vote = models.IntegerField(default=0)
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         OverflowUser,

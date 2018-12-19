@@ -8,6 +8,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
     <title>Overflow Clone</title>
+    <style>
+        .vote_wrap {
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
 </head>
 
 <body>
@@ -59,9 +65,10 @@
                         Answers:<br>
                         {% for answer in question.answer.all %}
                         <div class="card">
-                            {{answer.body}} <br>
+                            {{answer.body}} <br> <p class='vote_wrap'>Kenzie Karma: {{ answer.vote }} <a href="/upvote/answer/{{ answer.id }}">Upvote</a> <a href="/downvote/answer/{{ answer.id }}">Downvote</a></p>
                         </div>
                         {%endfor%}
+                        <p class='vote_wrap'>Kenzie Karma: {{ question.vote }} <a href="/upvote/question/{{ question.id }}">Upvote</a> <a href="/downvote/question/{{ question.id }}">Downvote</a></p>
                     </div>
                 </div>
                 {% endfor %}
