@@ -71,9 +71,9 @@ def homepage_view(request, sort=None):
         if sort == 'new':
             questions = Question.objects.order_by('-date')
         elif sort == 'upvote':
-            questions = Question.objects.order_by('vote')
+            questions = Question.objects.order_by('-vote')
         elif sort == 'tag':
-            questions = Question.objects.order_by('tags')
+            questions = set(Question.objects.order_by('tags'))
         elif sort == 'unanswered':
             questions = Question.objects.order_by('answered')
     else:
