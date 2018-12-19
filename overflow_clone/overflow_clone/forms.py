@@ -23,3 +23,7 @@ class QuestionForm(forms.Form):
 
 class UserSettingsUpdateForm(forms.Form):
     bio = forms.CharField(widget=forms.Textarea)
+
+
+class AnswerForm(forms.Form):
+    body = forms.CharField(label='Answer', widget=forms.Textarea())

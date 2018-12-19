@@ -22,9 +22,11 @@ from overflow_clone.views import (
     login_view,
     logout_view,
     question_form_view,
-    bio_form_view
+    bio_form_view,
+    answer_form_view,
+    upvote,
+    downvote
 )
-from overflow_clone import views
 from overflow_clone.models import (
     OverflowUser,
     Question,
@@ -40,10 +42,14 @@ admin.site.register(Tag)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    path('', homepage_view, name='homepage'),
+    path('home/', homepage_view, name='homepage'),
+    path('home/<sort>', homepage_view),
     path('signup/', signup_view),
     path('login/', login_view, name='login'),
     path('logout/', logout_view),
     path('post/', question_form_view,),
-    path('settings/', bio_form_view)
+    path('settings/', bio_form_view),
+    path('answer/<int:question_id>', answer_form_view,),
+    path('upvote/<vote_type>/<int:id>', upvote),
+    path('downvote/<vote_type>/<int:id>', downvote),
 ]

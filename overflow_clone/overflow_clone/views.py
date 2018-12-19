@@ -1,14 +1,15 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
-from overflow_clone.models import OverflowUser, Question
-from django.contrib.auth.models import User
-from django.contrib.auth import login, logout, authenticate
-from overflow_clone.forms import(
+from overflow_clone.models import OverflowUser, Question, Answer, Comment
+from overflow_clone.forms import (
     SignupForm,
     LoginForm,
     QuestionForm,
+    AnswerForm,
     UserSettingsUpdateForm
     )
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout, authenticate
 
 
 def signup_view(request):
@@ -52,7 +53,7 @@ def login_view(request):
         if next:
             return HttpResponseRedirect(next)
         else:
-            return HttpResponseRedirect("/")
+            return HttpResponseRedirect(reverse('homepage'))
 
     return render(request, html, {'form': form})
 
@@ -64,19 +65,30 @@ def logout_view(request):
     return HttpResponseRedirect(reverse('homepage'))
 
 
-def homepage_view(request):
+def homepage_view(request, sort=None):
 
     html = "homepage.html"
-
+    if sort:
+        if sort == 'new':
+            questions = Question.objects.order_by('-date')
+        elif sort == 'upvote':
+            questions = Question.objects.order_by('vote')
+        elif sort == 'tag':
+            questions = Question.objects.order_by('tags')
+        elif sort == 'unanswered':
+            questions = Question.objects.order_by('answered')
+    else:
+        questions = Question.objects.all()
     content = {
+        'questions': questions
     }
-
     return render(request, html, content)
 
 
 def question_form_view(request):
     form = QuestionForm(None or request.POST)
     html = "post.html"
+
     if form.is_valid():
         body = form.cleaned_data['body']
         tags = form.cleaned_data['tags']
@@ -87,10 +99,7 @@ def question_form_view(request):
         )
         question.tags.set(tags)
         return HttpResponseRedirect(reverse('homepage'))
-    content = {
-    }
-
-    return render(request, html, content)
+    return render(request, html, {'form': form, 'form_name': 'Question'})
 
 
 def bio_form_view(request):
@@ -112,3 +121,50 @@ def bio_form_view(request):
         form = UserSettingsUpdateForm(None)
 
     return render(request, html, {'form': form})
+
+
+def answer_form_view(request, question_id):
+    form = AnswerForm(None or request.POST)
+    html = "post.html"
+
+    if form.is_valid():
+        body = form.cleaned_data['body']
+        answer = Answer.objects.create(
+            body=body,
+            author=request.user.overflowuser
+        )
+        Question.objects.get(id=question_id).answer.add(answer)
+        return HttpResponseRedirect(reverse('homepage'))
+    return render(request, html, {'form': form, 'form_name': 'Answer'})
+
+
+def upvote(request, vote_type, id):
+    if vote_type == 'question':
+        question = Question.objects.get(id=id)
+        question.vote = question.vote + 1
+        question.save()
+    if vote_type == 'answer':
+        answer = Answer.objects.get(id=id)
+        answer.vote = answer.vote + 1
+        answer.save()
+    if vote_type == 'comment':
+        comment = Comment.objects.get(id=id)
+        comment.vote = comment.vote + 1
+        comment.save()
+    return HttpResponseRedirect(reverse('homepage'))
+
+
+def downvote(request, vote_type, id):
+    if vote_type == 'question':
+        question = Question.objects.get(id=id)
+        question.vote = question.vote - 1
+        question.save()
+    if vote_type == 'answer':
+        answer = Answer.objects.get(id=id)
+        answer.vote = answer.vote - 1
+        answer.save()
+    if vote_type == 'comment':
+        comment = Comment.objects.get(id=id)
+        comment.vote = comment.vote - 1
+        comment.save()
+    return HttpResponseRedirect(reverse('homepage'))
