@@ -19,3 +19,8 @@ class QuestionForm(forms.Form):
         queryset=Tag.objects.all(),
         widget=forms.CheckboxSelectMultiple()
         )
+
+
+class AnswerForm(forms.Form):
+
+    body = forms.CharField(label='Answer', widget=forms.Textarea())
