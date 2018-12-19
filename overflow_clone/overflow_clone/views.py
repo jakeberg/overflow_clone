@@ -5,7 +5,8 @@ from overflow_clone.forms import (
     SignupForm,
     LoginForm,
     QuestionForm,
-    AnswerForm
+    AnswerForm,
+    UserSettingsUpdateForm
     )
 from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
@@ -99,6 +100,27 @@ def question_form_view(request):
         question.tags.set(tags)
         return HttpResponseRedirect(reverse('homepage'))
     return render(request, html, {'form': form, 'form_name': 'Question'})
+
+
+def bio_form_view(request):
+    html = 'user_settings.html'
+    user = OverflowUser.objects.filter(user=request.user).first()
+    if request.method == 'POST':
+        # Take the info from the POST and shove it in the db
+        form = UserSettingsUpdateForm(request.POST or None)
+
+        if form.is_valid():
+            data = form.cleaned_data
+            user.bio = data['bio']
+            user.save()
+
+            return render(request, 'homepage.html')
+
+    else:
+        # everything else will be a GET request
+        form = UserSettingsUpdateForm(None)
+
+    return render(request, html, {'form': form})
 
 
 def answer_form_view(request, question_id):
