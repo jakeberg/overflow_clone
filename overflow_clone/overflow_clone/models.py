@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class OverflowUser(models.Model):
     name = models.CharField(max_length=50)
     bio = models.CharField(max_length=50)
-    reputation = models.IntegerField(null=True)
+    reputation = models.IntegerField(default=0)
     interests = models.ManyToManyField(
         "Tag",
         symmetrical=False,
