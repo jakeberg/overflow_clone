@@ -9,22 +9,32 @@
 <body>
     <div>
         <div>
-            <h1>Questions</h1>
-                {% for item in data %}
+                <h1>{{user}}'s profile</h1>
+        </div>
+        <hr>
+        <div>
 
-                    <a href="/recipe/{{item.id}}"><h2>{{ item.title }}</h2></a>
+            <h2>About {{user}}</h2>
+                <h3>{{user.bio}}</h3>
+                    {% if user.id == current_user.id %}
+                        <p>
+                            <a href="/settings/">Edit my bio</a>
+                        </p>
+                    {% endif %}
+        </div>
+        <hr>
+        <div>
+            <h2>Questions</h2>
+                {% for question in questions %}
+
+                    <a href="/question/{{question.id}}"><h2>{{ question.body }}</h2></a>
 
                 {% endfor %}
         </div>
         <hr>
         <div>
-            <h1>Author</h1>
-            <h3>{{author}}</h3>
-        </div>
-        <hr>
-        <div>
-            <h1>Author Bio</h1>
-            <p>{{bio}}</p>
+                <H1>Reputation</H1>
+                <p>{{user.reputation}}</p>
         </div>
     </div>
 </body>
