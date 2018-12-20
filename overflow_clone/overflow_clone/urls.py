@@ -13,9 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.urls import path
+from rest_framework import routers
 from overflow_clone.views import (
     homepage_view,
     signup_view,
@@ -33,7 +34,24 @@ from overflow_clone.models import (
     Question,
     Answer,
     Comment,
-    Tag)
+    Tag
+)
+from overflow_clone.API.views import (
+    UserViewSet,
+    OverflowUserViewSet,
+    QuestionViewSet,
+    AnswerViewSet,
+    CommentViewSet,
+    TagViewSet
+)
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'overflow-users', OverflowUserViewSet)
+router.register(r'questions', QuestionViewSet)
+router.register(r'answers', AnswerViewSet)
+router.register(r'comments', CommentViewSet)
+router.register(r'tags', TagViewSet)
 
 admin.site.register(OverflowUser)
 admin.site.register(Question)
@@ -53,5 +71,9 @@ urlpatterns = [
     path('answer/<int:question_id>', answer_form_view,),
     path('upvote/<vote_type>/<int:id>', upvote),
     path('downvote/<vote_type>/<int:id>', downvote),
-    path('author/<int:author_pk>', user_profile_view)
+    path('author/<int:author_pk>', user_profile_view),
+    url(r'^', include(router.urls)),
+    url(r'^api-auth/', include(
+        'rest_framework.urls',
+        namespace='rest_framework'))
 ]
