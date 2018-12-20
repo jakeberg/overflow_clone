@@ -28,10 +28,7 @@ def signup_view(request):
             login(request, user)
             OverflowUser.objects.create(name=user.username, user=user, bio="")
             return HttpResponseRedirect(reverse('login'))
-
     return render(request, html, {'form': form})
-
-    return render(request, html)
 
 
 def login_view(request):
@@ -68,7 +65,6 @@ def logout_view(request):
 def homepage_view(request, sort=None):
 
     html = "homepage.html"
-    user = OverflowUser.objects.get(id=request.user.id)
 
     if sort:
         if sort == 'new':
@@ -82,6 +78,11 @@ def homepage_view(request, sort=None):
     else:
         questions = Question.objects.all()
 
+    reputation = 0
+    if request.user.is_authenticated:
+        user = OverflowUser.objects.get(id=request.user.id)
+        reputation = user.reputation
+        
     content = {
         'questions': questions,
         'upvote_access': " " if user.reputation >= 15 else "disabled",
@@ -124,7 +125,6 @@ def bio_form_view(request):
     else:
         # everything else will be a GET request
         form = UserSettingsUpdateForm(None)
-
     return render(request, html, {'form': form})
 
 
@@ -192,7 +192,6 @@ def user_profile_view(request, author_pk):
     questions = Question.objects.filter(author_id=author_pk)
     user = OverflowUser.objects.filter(user=author_pk).first()
     current_user = request.user
-
     return render(request, html, {'questions': questions.values(),
                                   'user': user,
                                   'current_user': current_user
