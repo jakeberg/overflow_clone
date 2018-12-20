@@ -85,8 +85,8 @@ def homepage_view(request, sort=None):
         
     content = {
         'questions': questions,
-        'upvote_access': " " if user.reputation >= 15 else "disabled",
-        'current_user': user
+        'upvote_access': " " if reputation >= 15 else "disabled",
+        'current_user': request.user
     }
     return render(request, html, content)
 
