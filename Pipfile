@@ -9,6 +9,7 @@ name = "pypi"
 "pep8" = "*"
 django = "*"
 ipdb = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.7"

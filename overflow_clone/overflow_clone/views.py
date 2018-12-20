@@ -1,6 +1,6 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
-from overflow_clone.models import OverflowUser, Question, Answer, Comment
+from overflow_clone.models import OverflowUser, Question, Answer, Comment, Tag
 from overflow_clone.forms import (
     SignupForm,
     LoginForm,
@@ -82,7 +82,7 @@ def homepage_view(request, sort=None):
     if request.user.is_authenticated:
         user = OverflowUser.objects.get(id=request.user.id)
         reputation = user.reputation
-        
+
     content = {
         'questions': questions,
         'upvote_access': " " if reputation >= 15 else "disabled",
