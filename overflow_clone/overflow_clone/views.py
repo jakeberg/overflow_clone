@@ -84,7 +84,8 @@ def homepage_view(request, sort=None):
 
     content = {
         'questions': questions,
-        'upvote_access': " " if user.reputation >= 15 else "disabled"
+        'upvote_access': " " if user.reputation >= 15 else "disabled",
+        'current_user': user
     }
     return render(request, html, content)
 
@@ -184,3 +185,15 @@ def downvote(request, vote_type, id):
         comment.vote = comment.vote - 1
         comment.save()
     return HttpResponseRedirect(reverse('homepage'))
+
+
+def user_profile_view(request, author_pk):
+    html = 'user_profile.html'
+    questions = Question.objects.filter(author_id=author_pk)
+    user = OverflowUser.objects.filter(user=author_pk).first()
+    current_user = request.user
+
+    return render(request, html, {'questions': questions.values(),
+                                  'user': user,
+                                  'current_user': current_user
+                                  })
