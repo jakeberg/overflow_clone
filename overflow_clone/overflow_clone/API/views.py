@@ -17,7 +17,7 @@ from rest_framework import viewsets
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for all questions
+    API endpoint for all users
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -25,7 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class OverflowUserViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for all questions
+    API endpoint for all overflow user
     """
     queryset = OverflowUser.objects.all()
     serializer_class = OverflowUserSerializer
@@ -41,7 +41,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 class AnswerViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for all questions
+    API endpoint for all answers
     """
     queryset = Answer.objects.all()
     serializer_class = AnswerSerializer
@@ -49,7 +49,7 @@ class AnswerViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for all questions
+    API endpoint for all comments
     """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
@@ -57,7 +57,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class TagViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for all questions
+    API endpoint for all tags
     """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
