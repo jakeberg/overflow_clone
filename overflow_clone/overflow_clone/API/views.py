@@ -6,12 +6,12 @@ from overflow_clone.models import (
     Comment,
     Tag)
 from overflow_clone.serializers import (
-    UserSerializer,
     OverflowUserSerializer,
     QuestionSerializer,
     AnswerSerializer,
     CommentSerializer,
     TagSerializer)
+from core.serializers import UserSerializer
 from rest_framework import viewsets
 
 

@@ -17,6 +17,7 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
+from rest_framework_jwt.views import obtain_jwt_token
 from overflow_clone.views import (
     homepage_view,
     signup_view,
@@ -75,5 +76,7 @@ urlpatterns = [
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include(
         'rest_framework.urls',
-        namespace='rest_framework'))
+        namespace='rest_framework')),
+    path('token-auth/', obtain_jwt_token),
+    path('core/', include('core.urls')),
 ]
