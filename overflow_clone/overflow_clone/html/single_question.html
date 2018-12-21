@@ -55,11 +55,10 @@
                 <div class="row">
                     <h4 class="col">Feed</h4>
                 </div>
-                {% for question in questions %}
                 <div class="card">
                     <div class="card-body">
                         <h6><a href="/author/{{ question.author.id }}">{{question.author.name}}</a> || {{question.date}}</h6>
-                        <a href="/question/{{question.id}}">{{question.body}}</a>
+                        {{question.body}}
                         <br>
                         Tags: {% for tag in question.tags.all %}
                         {{tag.title}}
@@ -78,8 +77,7 @@
                                 <a class="btn {{ upvote_access }}" href="/downvote/answer/{{ answer.id }}">Downvote</a>
                             </p>
                         </div>
-                        {%endfor%}
-                        <p class='vote_wrap'>
+]                        <p class='vote_wrap'>
                             Kenzie Karma: {{ question.vote }}
                             <a class="btn {{ upvote_access }}" href="/upvote/question/{{ question.id }}">Upvote</a>
                             <a class="btn {{ upvote_access }}" href="/downvote/question/{{ question.id }}">Downvote</a>

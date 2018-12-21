@@ -28,7 +28,8 @@ from overflow_clone.views import (
     answer_form_view,
     upvote,
     downvote,
-    user_profile_view
+    user_profile_view,
+    single_question_view
 )
 from overflow_clone.models import (
     OverflowUser,
@@ -73,6 +74,7 @@ urlpatterns = [
     path('upvote/<vote_type>/<int:id>', upvote),
     path('downvote/<vote_type>/<int:id>', downvote),
     path('author/<int:author_pk>', user_profile_view),
+    path('question/<int:question_id>', single_question_view),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include(
         'rest_framework.urls',

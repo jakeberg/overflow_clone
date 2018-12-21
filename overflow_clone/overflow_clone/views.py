@@ -196,3 +196,22 @@ def user_profile_view(request, author_pk):
                                   'user': user,
                                   'current_user': current_user
                                   })
+
+
+def single_question_view(request, question_id):
+    html = 'single_question.html'
+    question = Question.objects.all().filter(id=question_id)
+    reputation = 0
+
+    if request.user.is_authenticated:
+        user = OverflowUser.objects.get(id=request.user.id)
+        reputation = user.reputation
+
+    content = {
+        'question': question,
+        'upvote_access': " " if reputation >= 15 else "disabled",
+        'current_user': request.user
+    }
+    print(content['question'])
+
+    return render(request, html, {'question': content['question'][0]})
