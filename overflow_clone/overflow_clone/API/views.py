@@ -45,10 +45,12 @@ class QuestionViewSet(viewsets.ModelViewSet):
         data = request.data
         user = User.objects.filter(username=data['author']).first()
         author = OverflowUser.objects.filter(user=user).first()
-        Question.objects.create(
+        tags = Tag.objects.filter(title__in=data['tags'])
+        question = Question.objects.create(
             body=data['body'],
             author=author
         )
+        question.tags.set(tags)
         return Response(request.data)
 
 
