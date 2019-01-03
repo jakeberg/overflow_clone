@@ -132,9 +132,9 @@ STATIC_URL = '/static/'
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),  # Authentication
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),  # Authentication
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -142,10 +142,14 @@ REST_FRAMEWORK = {
     ),  # Authentication
 }
 
+
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
 )  # Authentication
 
+CORS_ALLOW_CREDENTIALS = True
+
 JWT_AUTH = {
-    'JWT_RESPONSE_PAYLOAD_HANDLER': 'overflow_clone.utils.my_jwt_response_handler'
+    'JWT_RESPONSE_PAYLOAD_HANDLER': ('overflow_clone.utils.'
+                                     'my_jwt_response_handler')
 }  # Authentication

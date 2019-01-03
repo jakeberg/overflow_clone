@@ -13,6 +13,8 @@ from overflow_clone.serializers import (
     TagSerializer)
 from core.serializers import UserSerializer
 from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -37,6 +39,17 @@ class QuestionViewSet(viewsets.ModelViewSet):
     """
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
+
+    @action(detail=False, methods=['post'])
+    def new(self, request, pk=None):
+        data = request.data
+        user = User.objects.filter(username=data['author']).first()
+        author = OverflowUser.objects.filter(user=user).first()
+        Question.objects.create(
+            body=data['body'],
+            author=author
+        )
+        return Response(request.data)
 
 
 class AnswerViewSet(viewsets.ModelViewSet):

@@ -1,6 +1,6 @@
 from django.shortcuts import render, reverse
 from django.http import HttpResponseRedirect
-from overflow_clone.models import OverflowUser, Question, Answer, Comment, Tag
+from overflow_clone.models import OverflowUser, Question, Answer, Comment
 from overflow_clone.forms import (
     SignupForm,
     LoginForm,
@@ -94,7 +94,6 @@ def homepage_view(request, sort=None):
 def question_form_view(request):
     form = QuestionForm(None or request.POST)
     html = "post.html"
-
     if form.is_valid():
         body = form.cleaned_data['body']
         tags = form.cleaned_data['tags']
