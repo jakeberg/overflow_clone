@@ -40,7 +40,18 @@ class Question(models.Model):
         blank=True)
     date = models.DateTimeField(auto_now_add=True)
     answered = models.BooleanField(default=False)
-    vote = models.IntegerField(default=0)
+    upvote = models.ManyToManyField(
+        OverflowUser,
+        symmetrical=False,
+        blank=True,
+        related_name='upvote'
+    )
+    downvote = models.ManyToManyField(
+        OverflowUser,
+        symmetrical=False,
+        blank=True,
+        related_name='downvote'
+    )
 
     def __str__(self):
         return self.body

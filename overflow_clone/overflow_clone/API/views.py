@@ -76,18 +76,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(tag, many=True)
         return Response(serializer.data)
-    
-    @action(detail=False)
-    def upvote(self, request):
-        upvote = Question.objects.order_by('-vote')
-
-        page = self.paginate_queryset(upvote)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(upvote, many=True)
-        return Response(serializer.data)
 
     @action(detail=False)
     def unanswered(self, request):
@@ -100,6 +88,40 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(unanswered, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['post'])
+    def upvote(self, request, pk=None):
+        data = request.data
+        upvoter_user = User.objects.get(username=data['user'])
+        upvoter = OverflowUser.objects.get(user=upvoter_user)
+        question = Question.objects.filter(
+            body=data['question']['body']
+            ).first()
+        if upvoter not in question.upvote.all():
+            question.upvote.add(upvoter)
+        if upvoter in question.downvote.all():
+            question.downvote.remove(upvoter)
+        return Response({
+            'downvote': question.downvote.all().values(),
+            'upvote': question.upvote.all().values()
+            })
+
+    @action(detail=False, methods=['post'])
+    def downvote(self, request, pk=None):
+        data = request.data
+        downvoter_user = User.objects.get(username=data['user'])
+        downvoter = OverflowUser.objects.get(user=downvoter_user)
+        question = Question.objects.filter(
+            body=data['question']['body']
+            ).first()
+        if downvoter not in question.downvote.all():
+            question.downvote.add(downvoter)
+        if downvoter in question.upvote.all():
+            question.upvote.remove(downvoter)
+        return Response({
+            'downvote': question.downvote.all().values(),
+            'upvote': question.upvote.all().values()
+            })
 
 
 class AnswerViewSet(viewsets.ModelViewSet):

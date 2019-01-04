@@ -29,12 +29,12 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
             'body',
             'author',
             'tags',
-            'vote',
             'answer',
             'comment',
             'date',
             'answered',
-            'vote')
+            'upvote',
+            'downvote')
 
 
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):
