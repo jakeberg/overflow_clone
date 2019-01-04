@@ -53,6 +53,54 @@ class QuestionViewSet(viewsets.ModelViewSet):
         question.tags.set(tags)
         return Response(request.data)
 
+    @action(detail=False)
+    def date(self, request):
+        date = Question.objects.all().order_by('-date')
+
+        page = self.paginate_queryset(date)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(date, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False)
+    def tag(self, request):
+        tag = Question.objects.order_by('tags')
+
+        page = self.paginate_queryset(tag)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(tag, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False)
+    def upvote(self, request):
+        upvote = Question.objects.order_by('-vote')
+
+        page = self.paginate_queryset(upvote)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(upvote, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False)
+    def unanswered(self, request):
+        unanswered = Question.objects.order_by('answered')
+
+        page = self.paginate_queryset(unanswered)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(unanswered, many=True)
+        return Response(serializer.data)
+
 
 class AnswerViewSet(viewsets.ModelViewSet):
     """
