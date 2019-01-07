@@ -171,6 +171,36 @@ class QuestionViewSet(viewsets.ModelViewSet):
             'upvote': question.upvote.all().values()
             })
 
+    @action(detail=False)
+    def serve(self, request, pk=None):
+        questions = Question.objects.all()
+        served_questions = []
+        for question in questions.all():
+            author = OverflowUser.objects.filter(
+                name=question.author.name).first().name
+            tags = []
+            for tag in question.tags.all():
+                tags.append(tag.title)
+            comments = []
+            for comment in question.comment.all():
+                comments.append({
+                    'body': comment.body,
+                    'vote': comment.vote,
+                    'date': comment.date,
+                    'author': comment.author.name
+                })
+            served_questions.append({
+                'body': question.body,
+                'author': author,
+                'tags': tags,
+                'upvote': question.upvote.all().values(),
+                'downvote': question.downvote.all().values(),
+                'comments': comments,
+                'date': question.date,
+                'answered': question.answered
+            })
+        return Response(served_questions)
+
 
 class AnswerViewSet(viewsets.ModelViewSet):
     """
