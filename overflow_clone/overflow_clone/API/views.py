@@ -15,6 +15,7 @@ from core.serializers import UserSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Count
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -47,6 +48,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         author = OverflowUser.objects.filter(user=user).first()
         tags = Tag.objects.filter(title__in=data['tags'])
         question = Question.objects.create(
+            title=data['title'],
             body=data['body'],
             author=author
         )
@@ -89,6 +91,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(unanswered, many=True)
         return Response(serializer.data)
 
+    @action(detail=False)
+    def voted(self, request):
+        voted = Question.objects.order_by('-vote')
+
+        page = self.paginate_queryset(voted)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(voted, many=True)
+        return Response(serializer.data)
+
     @action(detail=False, methods=['post'])
     def upvote(self, request, pk=None):
         data = request.data
@@ -101,6 +115,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.upvote.add(upvoter)
         if upvoter in question.downvote.all():
             question.downvote.remove(upvoter)
+        question.vote = question.upvote.count() - question.downvote.count()
+        question.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
@@ -118,6 +134,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.downvote.add(downvoter)
         if downvoter in question.upvote.all():
             question.upvote.remove(downvoter)
+        question.vote = question.upvote.count() - question.downvote.count()
+        question.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
