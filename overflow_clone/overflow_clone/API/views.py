@@ -100,7 +100,36 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(unanswered, many=True)
         return Response(serializer.data)
-
+    
+    @action(detail=False)
+    def serve(self, request, pk=None):
+        questions = Question.objects.all()
+        served_questions = []
+        for question in questions.all():
+            author = OverflowUser.objects.filter(
+                name=question.author.name).first().name
+            tags = []
+            for tag in question.tags.all():
+                tags.append(tag.title)
+            comments = []
+            for comment in question.comment.all():
+                comments.append({
+                    'body': comment.body,
+                    'vote': comment.vote,
+                    'date': comment.date,
+                    'author': comment.author.name
+                })
+            served_questions.append({
+                'body': question.body,
+                'author': author,
+                'tags': tags,
+                'vote': question.vote,
+                'comments': comments,
+                'date': question.date,
+                'answered': question.answered
+            })
+        return Response(served_questions)
+        
 
 class AnswerViewSet(viewsets.ModelViewSet):
     """
@@ -116,6 +145,25 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+    @action(detail=False, methods=['post'])
+    def new(self, request, pk=None):
+        data = request.data
+        user = User.objects.filter(username=data['author']).first()
+        question = Question.objects.filter(
+            body=data['question']['body']).first()
+        new_comment_author = OverflowUser.objects.filter(user=user).first()
+        new_comment = Comment.objects.create(
+            body=data['comment'],
+            author=new_comment_author
+        )
+
+        question.comment.add(new_comment)
+        return Response({
+            'body': new_comment.body,
+            'author': new_comment_author.name,
+            'date': new_comment.date
+        })
 
 
 class TagViewSet(viewsets.ModelViewSet):
