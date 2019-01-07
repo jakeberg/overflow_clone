@@ -30,7 +30,6 @@ class Question(models.Model):
         "Tag",
         symmetrical=False,
         blank=True)
-    vote = models.IntegerField(null=True)
     answer = models.ManyToManyField(
         "Answer",
         symmetrical=False,
@@ -45,15 +44,14 @@ class Question(models.Model):
         OverflowUser,
         symmetrical=False,
         blank=True,
-        related_name='upvote'
+        related_name='question_upvote'
     )
     downvote = models.ManyToManyField(
         OverflowUser,
         symmetrical=False,
         blank=True,
-        related_name='downvote'
+        related_name='question_downvote'
     )
-    vote = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
@@ -75,7 +73,18 @@ class Answer(models.Model):
 
 class Comment(models.Model):
     body = models.CharField(max_length=150)
-    vote = models.IntegerField(default=0)
+    upvote = models.ManyToManyField(
+        OverflowUser,
+        symmetrical=False,
+        blank=True,
+        related_name='comment_upvote'
+    )
+    downvote = models.ManyToManyField(
+        OverflowUser,
+        symmetrical=False,
+        blank=True,
+        related_name='comment_downvote'
+    )
     date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         OverflowUser,
