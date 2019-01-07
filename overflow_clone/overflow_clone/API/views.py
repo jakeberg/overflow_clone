@@ -33,6 +33,19 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
     queryset = OverflowUser.objects.all()
     serializer_class = OverflowUserSerializer
 
+    @action(detail=False, methods=['post'])
+    def overflow_user(self, request, pk=None):
+        data = request.data
+        user = User.objects.filter(username=data['author']).first()
+        overflow_user = OverflowUser.objects.filter(user=user).first()
+        return Response({
+            "name": overflow_user.name,
+            "bio": overflow_user.bio,
+            "reputation": overflow_user.reputation,
+            "interests": overflow_user.interests.all().values(),
+            "favorites": [i["id"] for i in overflow_user.favorites.all().values()],
+            })
+
 
 class QuestionViewSet(viewsets.ModelViewSet):
     """
@@ -117,11 +130,14 @@ class QuestionViewSet(viewsets.ModelViewSet):
             for comment in question.comment.all():
                 comments.append({
                     'body': comment.body,
-                    'vote': comment.vote,
                     'date': comment.date,
-                    'author': comment.author.name
+                    'author': comment.author.name,
+                    'upvote': comment.upvote.all().values(),
+                    'downvote': comment.downvote.all().values()
                 })
+            answer = question.answer.all().values().first() or {}
             served_questions.append({
+                'id': question.id,
                 'body': question.body,
                 'author': author,
                 'tags': tags,
@@ -129,7 +145,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 'downvote': question.downvote.all().values(),
                 'comments': comments,
                 'date': question.date,
-                'answered': question.answered
+                'answered': question.answered,
+                'answer': answer
             })
         return Response(served_questions)
 
@@ -145,7 +162,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.upvote.add(upvoter)
         if upvoter in question.downvote.all():
             question.downvote.remove(upvoter)
-        question.vote = question.upvote.count() - question.downvote.count()
+        
         question.save()
         return Response({
             'downvote': question.downvote.all().values(),
@@ -164,42 +181,27 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.downvote.add(downvoter)
         if downvoter in question.upvote.all():
             question.upvote.remove(downvoter)
-        question.vote = question.upvote.count() - question.downvote.count()
         question.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
             })
 
-    @action(detail=False)
-    def serve(self, request, pk=None):
-        questions = Question.objects.all()
-        served_questions = []
-        for question in questions.all():
-            author = OverflowUser.objects.filter(
-                name=question.author.name).first().name
-            tags = []
-            for tag in question.tags.all():
-                tags.append(tag.title)
-            comments = []
-            for comment in question.comment.all():
-                comments.append({
-                    'body': comment.body,
-                    'vote': comment.vote,
-                    'date': comment.date,
-                    'author': comment.author.name
-                })
-            served_questions.append({
-                'body': question.body,
-                'author': author,
-                'tags': tags,
-                'upvote': question.upvote.all().values(),
-                'downvote': question.downvote.all().values(),
-                'comments': comments,
-                'date': question.date,
-                'answered': question.answered
-            })
-        return Response(served_questions)
+    @action(detail=False, methods=['post'])
+    def favorite(self, request, pk=None):
+        data = request.data
+        favorite_user = User.objects.get(username=data['user'])
+        overflow_user = OverflowUser.objects.get(user=favorite_user)
+        question = Question.objects.get(
+            id=data['id']
+            )
+        favorites = overflow_user.favorites.all()
+        if question not in favorites:
+            overflow_user.favorites.add(question)
+            return Response({"favorite": True})
+        else:
+            overflow_user.favorites.remove(question)
+            return Response({"favorite": False})
 
 
 class AnswerViewSet(viewsets.ModelViewSet):
@@ -228,13 +230,62 @@ class CommentViewSet(viewsets.ModelViewSet):
             body=data['comment'],
             author=new_comment_author
         )
-
         question.comment.add(new_comment)
         return Response({
             'body': new_comment.body,
             'author': new_comment_author.name,
-            'date': new_comment.date
+            'date': new_comment.date,
+            'upvote': new_comment.upvote.all().values(),
+            'downvote': new_comment.downvote.all().values()
         })
+
+    @action(detail=False, methods=['post'])
+    def upvote(self, request, pk=None):
+        data = request.data
+        upvoter_user = User.objects.get(username=data['user'])
+        upvoter = OverflowUser.objects.get(user=upvoter_user)
+        comment = Comment.objects.filter(
+            body=data['comment']['body']
+            ).first()
+        if upvoter not in comment.upvote.all():
+            comment.upvote.add(upvoter)
+        if upvoter in comment.downvote.all():
+            comment.downvote.remove(upvoter)
+        comment.save()
+        return Response({
+            'downvote': comment.downvote.all().values(),
+            'upvote': comment.upvote.all().values()
+            })
+
+    @action(detail=False, methods=['post'])
+    def downvote(self, request, pk=None):
+        data = request.data
+        downvoter_user = User.objects.get(username=data['user'])
+        downvoter = OverflowUser.objects.get(user=downvoter_user)
+        comment = Comment.objects.filter(
+            body=data['comment']['body']
+            ).first()
+        if downvoter not in comment.downvote.all():
+            comment.downvote.add(downvoter)
+        if downvoter in comment.upvote.all():
+            comment.upvote.remove(downvoter)
+        comment.save()
+        return Response({
+            'downvote': comment.downvote.all().values(),
+            'upvote': comment.upvote.all().values()
+            })
+
+    @action(detail=False, methods=['post'])
+    def answer(self, request, pk=None):
+        data = request.data
+        question = Question.objects.filter(body=data['question']['body']).first()
+        comment = Comment.objects.filter(body=data['comment']['body']).first()
+        if question.answer.all().first() is None:
+            question.answer.add(comment)
+            return Response({'body': comment.body})
+        elif comment in question.answer.all():
+            question.answer.remove(comment)
+            return Response({})
 
 
 class TagViewSet(viewsets.ModelViewSet):
