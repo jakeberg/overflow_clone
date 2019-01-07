@@ -122,6 +122,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
                     'upvote': comment.upvote.all().values(),
                     'downvote': comment.downvote.all().values()
                 })
+            answer = question.answer.all().values().first() or {}
             served_questions.append({
                 'body': question.body,
                 'author': author,
@@ -130,7 +131,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 'downvote': question.downvote.all().values(),
                 'comments': comments,
                 'date': question.date,
-                'answered': question.answered
+                'answered': question.answered,
+                'answer': answer
             })
         return Response(served_questions)
 
@@ -202,9 +204,11 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response({
             'body': new_comment.body,
             'author': new_comment_author.name,
-            'date': new_comment.date
+            'date': new_comment.date,
+            'upvote': new_comment.upvote.all().values(),
+            'downvote': new_comment.downvote.all().values()
         })
-    
+
     @action(detail=False, methods=['post'])
     def upvote(self, request, pk=None):
         data = request.data
@@ -217,7 +221,6 @@ class CommentViewSet(viewsets.ModelViewSet):
             comment.upvote.add(upvoter)
         if upvoter in comment.downvote.all():
             comment.downvote.remove(upvoter)
-        import ipdb; ipdb.set_trace()
         comment.save()
         return Response({
             'downvote': comment.downvote.all().values(),
@@ -241,6 +244,18 @@ class CommentViewSet(viewsets.ModelViewSet):
             'downvote': comment.downvote.all().values(),
             'upvote': comment.upvote.all().values()
             })
+
+    @action(detail=False, methods=['post'])
+    def answer(self, request, pk=None):
+        data = request.data
+        question = Question.objects.filter(body=data['question']['body']).first()
+        comment = Comment.objects.filter(body=data['comment']['body']).first()
+        if question.answer.all().first() is None:
+            question.answer.add(comment)
+            return Response({'body': comment.body})
+        elif comment in question.answer.all():
+            question.answer.remove(comment)
+            return Response({})
 
 
 class TagViewSet(viewsets.ModelViewSet):

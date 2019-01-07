@@ -31,9 +31,10 @@ class Question(models.Model):
         symmetrical=False,
         blank=True)
     answer = models.ManyToManyField(
-        "Answer",
+        "Comment",
         symmetrical=False,
-        blank=True)
+        blank=True,
+        related_name='question_answer')
     comment = models.ManyToManyField(
         "Comment",
         symmetrical=False,
