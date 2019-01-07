@@ -26,15 +26,16 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Question
         fields = (
+            'title',
             'body',
             'author',
             'tags',
-            'vote',
             'answer',
             'comment',
             'date',
             'answered',
-            'vote')
+            'upvote',
+            'downvote')
 
 
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):

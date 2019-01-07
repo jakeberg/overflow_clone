@@ -15,6 +15,7 @@ from core.serializers import UserSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.db.models import Count
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -47,6 +48,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         author = OverflowUser.objects.filter(user=user).first()
         tags = Tag.objects.filter(title__in=data['tags'])
         question = Question.objects.create(
+            title=data['title'],
             body=data['body'],
             author=author
         )
@@ -76,18 +78,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(tag, many=True)
         return Response(serializer.data)
-    
-    @action(detail=False)
-    def upvote(self, request):
-        upvote = Question.objects.order_by('-vote')
-
-        page = self.paginate_queryset(upvote)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(upvote, many=True)
-        return Response(serializer.data)
 
     @action(detail=False)
     def unanswered(self, request):
@@ -99,6 +89,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(unanswered, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False)
+    def voted(self, request):
+        voted = Question.objects.order_by('-vote')
+
+        page = self.paginate_queryset(voted)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(voted, many=True)
         return Response(serializer.data)
     
     @action(detail=False)
@@ -130,6 +132,45 @@ class QuestionViewSet(viewsets.ModelViewSet):
             })
         return Response(served_questions)
         
+
+    @action(detail=False, methods=['post'])
+    def upvote(self, request, pk=None):
+        data = request.data
+        upvoter_user = User.objects.get(username=data['user'])
+        upvoter = OverflowUser.objects.get(user=upvoter_user)
+        question = Question.objects.filter(
+            body=data['question']['body']
+            ).first()
+        if upvoter not in question.upvote.all():
+            question.upvote.add(upvoter)
+        if upvoter in question.downvote.all():
+            question.downvote.remove(upvoter)
+        question.vote = question.upvote.count() - question.downvote.count()
+        question.save()
+        return Response({
+            'downvote': question.downvote.all().values(),
+            'upvote': question.upvote.all().values()
+            })
+
+    @action(detail=False, methods=['post'])
+    def downvote(self, request, pk=None):
+        data = request.data
+        downvoter_user = User.objects.get(username=data['user'])
+        downvoter = OverflowUser.objects.get(user=downvoter_user)
+        question = Question.objects.filter(
+            body=data['question']['body']
+            ).first()
+        if downvoter not in question.downvote.all():
+            question.downvote.add(downvoter)
+        if downvoter in question.upvote.all():
+            question.upvote.remove(downvoter)
+        question.vote = question.upvote.count() - question.downvote.count()
+        question.save()
+        return Response({
+            'downvote': question.downvote.all().values(),
+            'upvote': question.upvote.all().values()
+            })
+
 
 class AnswerViewSet(viewsets.ModelViewSet):
     """

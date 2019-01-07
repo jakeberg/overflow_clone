@@ -23,6 +23,7 @@ class OverflowUser(models.Model):
 
 
 class Question(models.Model):
+    title = models.TextField(max_length=150, default="question")
     body = models.TextField(max_length=150)
     author = models.ForeignKey(OverflowUser, on_delete=models.CASCADE)
     tags = models.ManyToManyField(
@@ -40,10 +41,22 @@ class Question(models.Model):
         blank=True)
     date = models.DateTimeField(auto_now_add=True)
     answered = models.BooleanField(default=False)
+    upvote = models.ManyToManyField(
+        OverflowUser,
+        symmetrical=False,
+        blank=True,
+        related_name='upvote'
+    )
+    downvote = models.ManyToManyField(
+        OverflowUser,
+        symmetrical=False,
+        blank=True,
+        related_name='downvote'
+    )
     vote = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.body
+        return self.title
 
 
 class Answer(models.Model):
