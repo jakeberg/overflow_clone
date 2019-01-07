@@ -193,7 +193,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 'body': question.body,
                 'author': author,
                 'tags': tags,
-                'vote': question.vote,
+                'upvote': question.upvote.all().values(),
+                'downvote': question.downvote.all().values(),
                 'comments': comments,
                 'date': question.date,
                 'answered': question.answered
