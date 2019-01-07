@@ -33,6 +33,19 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
     queryset = OverflowUser.objects.all()
     serializer_class = OverflowUserSerializer
 
+    @action(detail=False, methods=['post'])
+    def overflow_user(self, request, pk=None):
+        data = request.data
+        user = User.objects.filter(username=data['author']).first()
+        overflow_user = OverflowUser.objects.filter(user=user).first()
+        return Response({
+            "name": overflow_user.name,
+            "bio": overflow_user.bio,
+            "reputation": overflow_user.reputation,
+            "interests": overflow_user.interests.all().values(),
+            "favorites": [i["id"] for i in overflow_user.favorites.all().values()],
+            })
+
 
 class QuestionViewSet(viewsets.ModelViewSet):
     """
@@ -124,6 +137,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 })
             answer = question.answer.all().values().first() or {}
             served_questions.append({
+                'id': question.id,
                 'body': question.body,
                 'author': author,
                 'tags': tags,
@@ -172,6 +186,22 @@ class QuestionViewSet(viewsets.ModelViewSet):
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
             })
+
+    @action(detail=False, methods=['post'])
+    def favorite(self, request, pk=None):
+        data = request.data
+        favorite_user = User.objects.get(username=data['user'])
+        overflow_user = OverflowUser.objects.get(user=favorite_user)
+        question = Question.objects.get(
+            id=data['id']
+            )
+        favorites = overflow_user.favorites.all()
+        if question not in favorites:
+            overflow_user.favorites.add(question)
+            return Response({"favorite": True})
+        else:
+            overflow_user.favorites.remove(question)
+            return Response({"favorite": False})
 
 
 class AnswerViewSet(viewsets.ModelViewSet):
