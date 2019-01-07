@@ -102,7 +102,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(voted, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False)
     def serve(self, request, pk=None):
         questions = Question.objects.all()
@@ -131,7 +131,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 'answered': question.answered
             })
         return Response(served_questions)
-        
 
     @action(detail=False, methods=['post'])
     def upvote(self, request, pk=None):
