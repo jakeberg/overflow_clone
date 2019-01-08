@@ -16,6 +16,11 @@ class OverflowUser(models.Model):
         symmetrical=False,
         blank=True
         )
+    notifications = models.ManyToManyField(
+        "Notification",
+        symmetrical=False,
+        blank=True
+    )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -102,3 +107,22 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Notification(models.Model):
+    answer_user = models.ForeignKey(
+        OverflowUser,
+        on_delete=models.CASCADE
+        )
+    answer = models.ForeignKey(
+        Comment,
+        on_delete=models.CASCADE
+    )
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE
+    )
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.answer
