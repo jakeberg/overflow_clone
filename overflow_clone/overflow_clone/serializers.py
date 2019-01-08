@@ -1,10 +1,11 @@
 from overflow_clone.models import (
-    User,
     OverflowUser,
     Question,
     Answer,
     Comment,
-    Tag)
+    Tag,
+    Notification
+    )
 from rest_framework import serializers
 
 
@@ -53,10 +54,11 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
-        model = Answer
+        model = Comment
         fields = (
             'body',
-            'vote',
+            'upvote',
+            'downvote',
             'author',
             'date')
 
@@ -66,3 +68,15 @@ class TagSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Tag
         fields = ('title',)
+
+
+class NotificationSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = Notification
+        fields = (
+            'answer_user',
+            'answer',
+            'question',
+            'date'
+        )

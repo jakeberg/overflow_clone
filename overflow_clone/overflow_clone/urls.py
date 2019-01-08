@@ -18,24 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from rest_framework import routers
 from rest_framework_jwt.views import obtain_jwt_token
-from overflow_clone.views import (
-    homepage_view,
-    signup_view,
-    login_view,
-    logout_view,
-    question_form_view,
-    bio_form_view,
-    answer_form_view,
-    upvote,
-    downvote,
-    user_profile_view
-)
 from overflow_clone.models import (
     OverflowUser,
     Question,
     Answer,
     Comment,
-    Tag
+    Tag,
+    Notification
 )
 from overflow_clone.API.views import (
     UserViewSet,
@@ -43,7 +32,8 @@ from overflow_clone.API.views import (
     QuestionViewSet,
     AnswerViewSet,
     CommentViewSet,
-    TagViewSet
+    TagViewSet,
+    NotificationViewSet
 )
 
 router = routers.DefaultRouter()
@@ -53,12 +43,14 @@ router.register(r'questions', QuestionViewSet)
 router.register(r'answers', AnswerViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'tags', TagViewSet)
+router.register(r'notifications', NotificationViewSet)
 
 admin.site.register(OverflowUser)
 admin.site.register(Question)
 admin.site.register(Answer)
 admin.site.register(Comment)
 admin.site.register(Tag)
+admin.site.register(Notification)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

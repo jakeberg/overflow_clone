@@ -4,18 +4,20 @@ from overflow_clone.models import (
     Question,
     Answer,
     Comment,
-    Tag)
+    Tag,
+    Notification)
 from overflow_clone.serializers import (
     OverflowUserSerializer,
     QuestionSerializer,
     AnswerSerializer,
     CommentSerializer,
-    TagSerializer)
+    TagSerializer,
+    NotificationSerializer
+    )
 from core.serializers import UserSerializer
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Count
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -43,7 +45,8 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
             "bio": overflow_user.bio,
             "reputation": overflow_user.reputation,
             "interests": overflow_user.interests.all().values(),
-            "favorites": [i["id"] for i in overflow_user.favorites.all().values()],
+            "favorites": ([i["id"] for i in
+                          overflow_user.favorites.all().values()]),
             })
 
 
@@ -146,7 +149,8 @@ class QuestionViewSet(viewsets.ModelViewSet):
                 'comments': comments,
                 'date': question.date,
                 'answered': question.answered,
-                'answer': answer
+                'answer': answer,
+                'title': question.title
             })
         return Response(served_questions)
 
@@ -162,7 +166,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
             question.upvote.add(upvoter)
         if upvoter in question.downvote.all():
             question.downvote.remove(upvoter)
-        
+
         question.save()
         return Response({
             'downvote': question.downvote.all().values(),
@@ -231,12 +235,18 @@ class CommentViewSet(viewsets.ModelViewSet):
             author=new_comment_author
         )
         question.comment.add(new_comment)
+        new_notification = Notification.objects.create(
+            answer_user=new_comment_author,
+            answer=new_comment,
+            question=question
+        )
+        question.author.notifications.add(new_notification)
         return Response({
             'body': new_comment.body,
             'author': new_comment_author.name,
             'date': new_comment.date,
             'upvote': new_comment.upvote.all().values(),
-            'downvote': new_comment.downvote.all().values()
+            'downvote': new_comment.downvote.all().values(),
         })
 
     @action(detail=False, methods=['post'])
@@ -278,7 +288,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def answer(self, request, pk=None):
         data = request.data
-        question = Question.objects.filter(body=data['question']['body']).first()
+        question = Question.objects.filter(
+            body=data['question']['body']).first()
         comment = Comment.objects.filter(body=data['comment']['body']).first()
         if question.answer.all().first() is None:
             question.answer.add(comment)
@@ -294,3 +305,25 @@ class TagViewSet(viewsets.ModelViewSet):
     """
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for all notifications
+    """
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+    @action(detail=False, methods=['post'])
+    def serve(self, request, pk=None):
+        data = request.data
+        user = OverflowUser.objects.filter(name=data['user']).first()
+        notifications = user.notifications.all()
+        served_notifications = []
+        for notification in notifications:
+            served_notifications.append({
+                'answer_user': notification.answer_user.name,
+                'question': notification.question.title,
+                'date': notification.date,
+            })
+        return Response(served_notifications)
