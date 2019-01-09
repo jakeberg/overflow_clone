@@ -155,6 +155,39 @@ class QuestionViewSet(viewsets.ModelViewSet):
         return Response(served_questions)
 
     @action(detail=False, methods=['post'])
+    def singleQuestion(self, request, pk=None):
+        data = request.data
+        question = Question.objects.get(id=data['questionId'])
+        author = OverflowUser.objects.filter(
+            name=question.author.name).first().name
+        tags = []
+        for tag in question.tags.all():
+            tags.append(tag.title)
+        comments = []
+        for comment in question.comment.all():
+            comments.append({
+                'body': comment.body,
+                'date': comment.date,
+                'author': comment.author.name,
+                'upvote': comment.upvote.all().values(),
+                'downvote': comment.downvote.all().values()
+            })
+        answer = question.answer.all().values().first() or {}
+        singleQuestion = {
+            'id': question.id,
+            'body': question.body,
+            'author': author,
+            'tags': tags,
+            'upvote': question.upvote.all().values(),
+            'downvote': question.downvote.all().values(),
+            'comments': comments,
+            'date': question.date,
+            'answered': question.answered,
+            'answer': answer
+        }
+        return Response(singleQuestion)
+
+    @action(detail=False, methods=['post'])
     def upvote(self, request, pk=None):
         data = request.data
         upvoter_user = User.objects.get(username=data['user'])
@@ -324,6 +357,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
             served_notifications.append({
                 'answer_user': notification.answer_user.name,
                 'question': notification.question.title,
+                'question_id': notification.question.id,
                 'date': notification.date,
             })
         return Response(served_notifications)
