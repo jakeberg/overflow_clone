@@ -45,7 +45,8 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
             "bio": overflow_user.bio,
             "reputation": overflow_user.reputation,
             "interests": overflow_user.interests.all().values(),
-            "favorites": [i["id"] for i in overflow_user.favorites.all().values()],
+            "favorites": [i["id"] for i in
+                          overflow_user.favorites.all().values()],
             "favorite_obj": overflow_user.favorites.all().values(),
             })
 
