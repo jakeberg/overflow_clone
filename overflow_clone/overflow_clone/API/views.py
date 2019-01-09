@@ -342,6 +342,7 @@ class CommentViewSet(viewsets.ModelViewSet):
             comment.upvote.remove(downvoter)
             comment_author.reputation -= 2
         comment.save()
+        comment_author.save()
         return Response({
             'downvote': comment.downvote.all().values(),
             'upvote': comment.upvote.all().values()
@@ -359,11 +360,15 @@ class CommentViewSet(viewsets.ModelViewSet):
             question.answer.add(comment)
             comment_author.reputation += 15
             question_author.reputation += 2
+            comment_author.save()
+            question_author.save()
             return Response({'body': comment.body})
         elif comment in question.answer.all():
             question.answer.remove(comment)
             comment_author.reputation -= 15
             question_author.reputation -= 2
+            comment_author.save()
+            question_author.save()
             return Response({})
 
 
