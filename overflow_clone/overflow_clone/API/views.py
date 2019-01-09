@@ -195,12 +195,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
         question = Question.objects.filter(
             body=data['question']['body']
             ).first()
+        question_author = OverflowUser.objects.get(name=question.author.name)
         if upvoter not in question.upvote.all():
             question.upvote.add(upvoter)
+            question_author.reputation += 5
+        elif upvoter in question.upvote.all():
+            question.upvote.remove(upvoter)
+            question_author.reputation -= 5
         if upvoter in question.downvote.all():
             question.downvote.remove(upvoter)
-
+            question_author.reputation += 2
         question.save()
+        question_author.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
@@ -214,11 +220,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
         question = Question.objects.filter(
             body=data['question']['body']
             ).first()
+        question_author = OverflowUser.objects.get(name=question.author.name)
         if downvoter not in question.downvote.all():
             question.downvote.add(downvoter)
+            question_author.reputation -= 2
+        elif downvoter in question.downvote.all():
+            question.downvote.remove(downvoter)
+            question_author.reputation += 2
         if downvoter in question.upvote.all():
             question.upvote.remove(downvoter)
+            question_author.reputation -= 5
         question.save()
+        question_author.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
