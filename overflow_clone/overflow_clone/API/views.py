@@ -41,7 +41,7 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
     serializer_class = OverflowUserSerializer
 
     @action(detail=False, methods=['post'])
-    def overflow_user(self, request, pk=None):
+    def overflow_user_profile(self, request, pk=None):
         name = request.data['author']
         overflow_user = get_overflow_user(name)
         return Response({
