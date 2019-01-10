@@ -1,7 +1,6 @@
 from overflow_clone.models import (
     OverflowUser,
     Question,
-    Answer,
     Comment,
     Tag,
     Notification
@@ -37,18 +36,6 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
             'answered',
             'upvote',
             'downvote')
-
-
-class AnswerSerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = Answer
-        fields = (
-            'body',
-            'author',
-            'vote',
-            'comment',
-            'date')
 
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):

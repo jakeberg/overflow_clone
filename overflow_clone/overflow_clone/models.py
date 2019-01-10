@@ -58,23 +58,10 @@ class Question(models.Model):
         blank=True,
         related_name='question_downvote'
     )
+    vote = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
-
-
-class Answer(models.Model):
-    body = models.TextField(max_length=150)
-    author = models.ForeignKey(
-        OverflowUser,
-        on_delete=models.CASCADE,
-        null=True)
-    vote = models.IntegerField(default=0)
-    comment = models.ManyToManyField("Comment", symmetrical=False)
-    date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.body
 
 
 class Comment(models.Model):

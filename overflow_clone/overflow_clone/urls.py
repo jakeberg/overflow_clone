@@ -21,7 +21,6 @@ from rest_framework_jwt.views import obtain_jwt_token
 from overflow_clone.models import (
     OverflowUser,
     Question,
-    Answer,
     Comment,
     Tag,
     Notification
@@ -30,7 +29,6 @@ from overflow_clone.API.views import (
     UserViewSet,
     OverflowUserViewSet,
     QuestionViewSet,
-    AnswerViewSet,
     CommentViewSet,
     TagViewSet,
     NotificationViewSet
@@ -40,31 +38,18 @@ router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'overflow-users', OverflowUserViewSet)
 router.register(r'questions', QuestionViewSet)
-router.register(r'answers', AnswerViewSet)
 router.register(r'comments', CommentViewSet)
 router.register(r'tags', TagViewSet)
 router.register(r'notifications', NotificationViewSet)
 
 admin.site.register(OverflowUser)
 admin.site.register(Question)
-admin.site.register(Answer)
 admin.site.register(Comment)
 admin.site.register(Tag)
 admin.site.register(Notification)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    # path('home/', homepage_view, name='homepage'),
-    # path('home/<sort>', homepage_view),
-    # path('signup/', signup_view),
-    # path('login/', login_view, name='login'),
-    # path('logout/', logout_view),
-    # path('post/', question_form_view,),
-    # path('settings/', bio_form_view),
-    # path('answer/<int:question_id>', answer_form_view,),
-    # path('upvote/<vote_type>/<int:id>', upvote),
-    # path('downvote/<vote_type>/<int:id>', downvote),
-    # path('author/<int:author_pk>', user_profile_view),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include(
         'rest_framework.urls',
