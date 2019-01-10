@@ -196,12 +196,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
         question = Question.objects.filter(
             body=data['question']['body']
             ).first()
+        question_author = OverflowUser.objects.get(name=question.author.name)
         if upvoter not in question.upvote.all():
             question.upvote.add(upvoter)
+            question_author.reputation += 5
+        elif upvoter in question.upvote.all():
+            question.upvote.remove(upvoter)
+            question_author.reputation -= 5
         if upvoter in question.downvote.all():
             question.downvote.remove(upvoter)
-
+            question_author.reputation += 2
         question.save()
+        question_author.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
@@ -215,11 +221,18 @@ class QuestionViewSet(viewsets.ModelViewSet):
         question = Question.objects.filter(
             body=data['question']['body']
             ).first()
+        question_author = OverflowUser.objects.get(name=question.author.name)
         if downvoter not in question.downvote.all():
             question.downvote.add(downvoter)
+            question_author.reputation -= 2
+        elif downvoter in question.downvote.all():
+            question.downvote.remove(downvoter)
+            question_author.reputation += 2
         if downvoter in question.upvote.all():
             question.upvote.remove(downvoter)
+            question_author.reputation -= 5
         question.save()
+        question_author.save()
         return Response({
             'downvote': question.downvote.all().values(),
             'upvote': question.upvote.all().values()
@@ -291,11 +304,18 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.filter(
             body=data['comment']['body']
             ).first()
+        comment_author = OverflowUser.objects.get(name=comment.author.name)
         if upvoter not in comment.upvote.all():
             comment.upvote.add(upvoter)
+            comment_author.reputation += 10
+        elif upvoter in comment.upvote.all():
+            comment.upvote.remove(upvoter)
+            comment_author.reputation -= 10
         if upvoter in comment.downvote.all():
             comment.downvote.remove(upvoter)
+            comment_author.reputation += 2
         comment.save()
+        comment_author.save()
         return Response({
             'downvote': comment.downvote.all().values(),
             'upvote': comment.upvote.all().values()
@@ -309,11 +329,20 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = Comment.objects.filter(
             body=data['comment']['body']
             ).first()
+        comment_author = OverflowUser.objects.get(name=comment.author.name)
         if downvoter not in comment.downvote.all():
             comment.downvote.add(downvoter)
+            comment_author.reputation -= 2
+            downvoter.reputation -= 1
+        elif downvoter in comment.downvote.all():
+            comment.downvote.remove(downvoter)
+            comment_author.reputation += 2
+            downvoter.reputation += 1
         if downvoter in comment.upvote.all():
             comment.upvote.remove(downvoter)
+            comment_author.reputation -= 2
         comment.save()
+        comment_author.save()
         return Response({
             'downvote': comment.downvote.all().values(),
             'upvote': comment.upvote.all().values()
@@ -324,12 +353,22 @@ class CommentViewSet(viewsets.ModelViewSet):
         data = request.data
         question = Question.objects.filter(
             body=data['question']['body']).first()
+        question_author = OverflowUser.objects.get(name=question.author.name)
         comment = Comment.objects.filter(body=data['comment']['body']).first()
+        comment_author = OverflowUser.objects.get(name=comment.author.name)
         if question.answer.all().first() is None:
             question.answer.add(comment)
+            comment_author.reputation += 15
+            question_author.reputation += 2
+            comment_author.save()
+            question_author.save()
             return Response({'body': comment.body})
         elif comment in question.answer.all():
             question.answer.remove(comment)
+            comment_author.reputation -= 15
+            question_author.reputation -= 2
+            comment_author.save()
+            question_author.save()
             return Response({})
 
 
