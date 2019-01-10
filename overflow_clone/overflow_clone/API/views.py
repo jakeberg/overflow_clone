@@ -65,7 +65,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def new(self, request, pk=None):
         data = request.data
-        author = get_overflow_user(request)
+        author = get_overflow_user(data['author'])
         tags = Tag.objects.filter(title__in=data['tags'])
         question = Question.objects.create(
             title=data['title'],
