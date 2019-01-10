@@ -143,7 +143,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         data = request.data
         question = Question.objects.filter(
             body=data['question']['body']).first()
-        new_comment_author = get_overflow_user(request)
+        new_comment_author = get_overflow_user(data['author'])
         new_comment = Comment.objects.create(
             body=data['comment'],
             author=new_comment_author
