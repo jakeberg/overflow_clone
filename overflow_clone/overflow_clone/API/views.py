@@ -57,10 +57,10 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def bio(self, request):
         data = request.data
-        user = User.objects.filter(username=data['author']['name']).first()
-        overflow_user = OverflowUser.objects.filter(user=user)
-        overflow_user.values().all().update(bio = data['bio']) 
-        return Response(request.data)
+        author = get_overflow_user(data['author']['name'])
+        author.bio = data['bio']
+        author.save()
+        return Response(author.bio)
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
