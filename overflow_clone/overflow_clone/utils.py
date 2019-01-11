@@ -91,8 +91,10 @@ def upvote_django_object(request, django_object):
         upvoted_object.downvote.remove(upvoter)
         object_owner.reputation += upvote_rep_values[django_object.__name__][
             'downvote']
+        upvoter.reputation += 1
     upvoted_object.save()
     object_owner.save()
+    upvoter.save()
     return Response({
         'downvote': upvoted_object.downvote.all().values(),
         'upvote': upvoted_object.upvote.all().values()
