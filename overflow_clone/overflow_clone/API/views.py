@@ -54,6 +54,14 @@ class OverflowUserViewSet(viewsets.ModelViewSet):
             "favorite_obj": overflow_user.favorites.all().values(),
             })
 
+    @action(detail=False, methods=['post'])
+    def bio(self, request):
+        data = request.data
+        author = get_overflow_user(data['author']['name'])
+        author.bio = data['bio']
+        author.save()
+        return Response(author.bio)
+
 
 class QuestionViewSet(viewsets.ModelViewSet):
     """
