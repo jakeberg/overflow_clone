@@ -81,13 +81,16 @@ def upvote_django_object(request, django_object):
     }
     if upvoter not in upvoted_object.upvote.all():
         upvoted_object.upvote.add(upvoter)
-        object_owner.reputation += upvote_rep_values[django_object.__name__]['upvote']
+        object_owner.reputation += upvote_rep_values[django_object.__name__][
+            'upvote']
     elif upvoter in upvoted_object.upvote.all():
         upvoted_object.upvote.remove(upvoter)
-        object_owner.reputation -= upvote_rep_values[django_object.__name__]['upvote']
+        object_owner.reputation -= upvote_rep_values[django_object.__name__][
+            'upvote']
     if upvoter in upvoted_object.downvote.all():
         upvoted_object.downvote.remove(upvoter)
-        object_owner.reputation += upvote_rep_values[django_object.__name__]['downvote']
+        object_owner.reputation += upvote_rep_values[django_object.__name__][
+            'downvote']
     upvoted_object.save()
     object_owner.save()
     return Response({
@@ -115,15 +118,18 @@ def downvote_django_object(request, django_object):
     }
     if downvoter not in downvoted_object.downvote.all():
         downvoted_object.downvote.add(downvoter)
-        object_owner.reputation -= downvote_rep_values[django_object.__name__]['downvote']
+        object_owner.reputation -= downvote_rep_values[django_object.__name__][
+            'downvote']
         downvoter.reputation -= 1
     elif downvoter in downvoted_object.downvote.all():
         downvoted_object.downvote.remove(downvoter)
-        object_owner.reputation += downvote_rep_values[django_object.__name__]['downvote']
+        object_owner.reputation += downvote_rep_values[django_object.__name__][
+            'downvote']
         downvoter.reputation += 1
     if downvoter in downvoted_object.upvote.all():
         downvoted_object.upvote.remove(downvoter)
-        object_owner.reputation -= downvote_rep_values[django_object.__name__]['upvote']
+        object_owner.reputation -= downvote_rep_values[django_object.__name__][
+            'upvote']
     downvoted_object.save()
     object_owner.save()
     downvoter.save()
